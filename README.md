@@ -2,7 +2,7 @@
 
 ## Jane Stout, Ph.D.
 
-The New York State [(NYS) Children in Foster Care Annually database] contains information on the total number of admissions, discharges, and children in foster care, the type of care, and total Child Protective Services (CPS) reports indicated each year in the state. The data have been collected from 1994-2017. As seen in [my code], I used R programming language to conduct the analyses and visualizations in this report.
+The New York State [(NYS) Children in Foster Care Annually database] contains information on the total number of admissions, discharges, and children in foster care, the type of care, and total Child Protective Services (CPS) reports indicated each year in the state. The data have been collected from 1994-2017. I used R programming language to conduct the analyses and visualizations in this report.
 
 As seen in Figure 1, while CPS Reports have remained steady over time, the number of children who are served by foster care has fallen over time. It is interesting (and perhaps disturbing) to note that, starting in 2006, the number of CPS reports outweighed the number of children in foster care.
 
