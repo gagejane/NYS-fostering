@@ -14,8 +14,7 @@ As seen in Figure 1, there is a wide discrepancy in the number of annual CPS rep
 We can look at the rate at which CPS reports occur and the rate at which children are admitted into foster care by NYS counties. See Figure 2a and 2b, respectively, for rates in 2017. These figures show that CPS reporting and foster care admittance are particularly concentrated in some counties (e.g., New York City). Further, higher CPS reporting rates tend to be more strongly associated with higher foster admittance (i.e., darker shaded counties tend to co-occur in Figures 2a and 2b).
 
 **Figure 2a. Number of CPS Reports in New York State Counties in 2017**
-
-![](images/CPS_heat.png)
+![](images/CPS_heat1.png)
 
 **Figure 2b. Number of Children Admitted into Foster Care in New York State Counties in 2017**
 
@@ -25,8 +24,7 @@ When we observe the rate at which CPS reporting and foster admittance have occur
 
 **Figure 3a. Count of CPS Reports in Top Five New York State Counties Over Time**.
 
-![](images/top_five_CPS.png)
-
+![](images/top_five_CPS1.png)
 **Figure 3b. Number of Children Served in Top Five New York Counties Over Time**
 
 ![](images/top_five_admitted.png)

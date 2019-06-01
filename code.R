@@ -73,7 +73,7 @@ df_county_CPS$Count <- df_county_CPS$Indicated.CPS.Reports
 map.df <- merge(countyMap, df_county_CPS, by='subregion', all.x=T)
 map.df <- map.df[order(map.df$order),]
 
-png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/CPS_heat.png', height = 600, width=800)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/CPS_heat1.png', height = 600, width=800)
 ggplot(map.df, aes(x=long, y=lat, group=group))+
   ggtitle('Number of CPS Reports in \n New York State Counties in 2017')+theme_classic()+
   xlab("Longitude") +
@@ -130,7 +130,7 @@ counties <- c('NEW YORK CITY', 'SUFFOLK', 'ERIE', 'NASSAU', 'MONROE')
 ds <- subset(df, County %in% counties)
 ds$Count <- ds$Indicated.CPS.Reports
 
-png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/top_five_CPS.png', height = 600, width = 800)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/top_five_CPS1.png', height = 600, width = 800)
 ggplot(ds, aes(x=Year, y=Count, fill=County))+theme_classic()+
   geom_area()+
   ggtitle('Count of CPS Reports in Top Five \n New York State Counties Over Time')+
@@ -148,7 +148,7 @@ dev.off()
 
 ds$Count <- ds$Admissions
 
-png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/top_five_served.png', height = 600, width = 800)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/top_five_admitted.png', height = 600, width = 800)
 ggplot(ds, aes(x=Year, y=Count, fill=County))+theme_classic()+
   geom_area()+
   ggtitle('Number of Children Admitted to Foster Care in \n Top Five New York State Counties Over Time')+
@@ -213,7 +213,7 @@ houses <- data.frame(Housing = c("Adoptive Home",
 drops <- c('Year')
 sums <- sums[, !(names(sums) %in% drops)]
 
-counts <- as.numeric(sums[1,])
+counts <- as.numeric(sums[1,]/1000000)
 house_counts <- cbind(houses, counts)
 house_counts <- house_counts[order(-house_counts$counts),]
 house_counts$Housing <- factor(house_counts$Housing, levels=house_counts$Housing)
@@ -223,7 +223,6 @@ house_counts$Housing <- factor(house_counts$Housing, levels=house_counts$Housing
 #Set the option before making your plot, if it still has scientific notation, 
 #set it to a higher number.
 options(scipen=2)
-
 png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/housing.png', height = 600, width = 800)
 ggplot(house_counts, aes(x=house_counts$Housing, y=house_counts$counts))+theme_classic()+
   geom_point(size=5, color='#FF6347')+
@@ -241,5 +240,5 @@ ggplot(house_counts, aes(x=house_counts$Housing, y=house_counts$counts))+theme_c
     legend.position="none"
   )+
   xlab('')+
-  ylab('Number of Care Days')
+  ylab('Number of Care Days (in millions)')
 dev.off() 
