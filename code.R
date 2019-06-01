@@ -1,4 +1,6 @@
-df <-read.csv('/Users/janestout/Dropbox/nys-children-in-foster-care-annually/children-in-foster-care-annually-beginning-1994.csv')
+#info for parents about CPS: https://www.preventchildabuseny.org/resour/parents/guide-child-protective-services
+file <- '/Users/janestout/Dropbox/Projects/NYS-foster/children-in-foster-care-annually-beginning-1994.csv'
+df <-read.csv(file)
 
 #Getting to know the data
 head(df)
@@ -15,20 +17,27 @@ df_CPS$Count <- df_CPS$Indicated.CPS.Reports
 drops <- c('Indicated.CPS.Reports')
 df_CPS <- df_CPS[, !(names(df_CPS) %in% drops)]
 
-df_Served <- aggregate(Number.of.Children.Served ~ Year, df, sum)
-df_Served$Activity <- 'Fostered'
-df_Served$Count <- df_Served$Number.of.Children.Served
-drops <- c('Number.of.Children.Served')
-df_Served <- df_Served[, !(names(df_Served) %in% drops)]
+# df_Served <- aggregate(Number.of.Children.Served ~ Year, df, sum)
+# df_Served$Activity <- 'Fostered'
+# df_Served$Count <- df_Served$Number.of.Children.Served
+# drops <- c('Number.of.Children.Served')
+# df_Served <- df_Served[, !(names(df_Served) %in% drops)]
 
+df_Admit <- aggregate(Admissions ~ Year, df, sum)
+df_Admit$Activity <- 'Admitted'
+df_Admit$Count <- df_Admit$Admissions
+drops <- c('Admissions')
+df_Admit <- df_Admit[, !(names(df_Admit) %in% drops)]
+                       
 #Merge dataframes together; add cases
-combined <- rbind(df_Served, df_CPS)
+combined <- rbind(df_Admit, df_CPS)
 str(combined)
+combined_2017 <-combined[which(Year==2017),]
 
 attach(combined)
 #Multiline plot of Admissions, Discharges, and CPS Reports across time
-png(file='/Users/janestout/Dropbox/nys-children-in-foster-care-annually/images/NYS_mulitline.png', height = 600, width=800)
-ggplot(combined, aes(Year, Count, colour=Activity)) + 
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/NYS_mulitline.png', height = 600, width=800)
+ggplot(combined, aes(Year, Count, colour=Activity)) + theme_classic() +
   geom_line() + geom_point() + ggtitle('Number of Children in Foster Care and \n CPS Reports in the State of New York Over Time')+
   theme(plot.title = element_text(size=24, face='bold', hjust=.5),
         axis.title = element_text(size=20, face='bold'),
@@ -36,7 +45,7 @@ ggplot(combined, aes(Year, Count, colour=Activity)) +
         legend.title = element_text(size=20, face='bold'),
         legend.text = element_text(size=16),
         axis.text.x = element_text(angle=70, hjust=1))+
-  scale_x_continuous(breaks=Year)
+  scale_x_continuous(breaks=Year) 
 dev.off()
 
 #Create a subset of the data: 2017 only
@@ -64,9 +73,9 @@ df_county_CPS$Count <- df_county_CPS$Indicated.CPS.Reports
 map.df <- merge(countyMap, df_county_CPS, by='subregion', all.x=T)
 map.df <- map.df[order(map.df$order),]
 
-png(file='/Users/janestout/Dropbox/nys-children-in-foster-care-annually/images/CPS_heat.png', height = 600, width=800)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/CPS_heat.png', height = 600, width=800)
 ggplot(map.df, aes(x=long, y=lat, group=group))+
-  ggtitle('Number of CPS Reports in \n New York State Counties in 2017')+
+  ggtitle('Number of CPS Reports in \n New York State Counties in 2017')+theme_classic()+
   xlab("Longitude") +
   ylab('Latitude')+
   geom_polygon(aes(fill=Count))+
@@ -85,16 +94,16 @@ ggplot(map.df, aes(x=long, y=lat, group=group))+
 dev.off()
 
 #Number Served
-df_county_served <- aggregate(Number.of.Children.Served ~ County, df, sum)
-df_county_served$subregion <- tolower(df_county_served$County)
-df_county_served$Count <- df_county_served$Number.of.Children.Served
+df_county_admit <- aggregate(Admissions ~ County, df, sum)
+df_county_admit$subregion <- tolower(df_county_admit$County)
+df_county_admit$Count <- df_county_admit$Admissions
 
-map.df <- merge(countyMap, df_county_served, by='subregion', all.x=T)
+map.df <- merge(countyMap, df_county_admit, by='subregion', all.x=T)
 map.df <- map.df[order(map.df$order),]
 
-png(file='/Users/janestout/Dropbox/nys-children-in-foster-care-annually/images/Served_heat.png', height = 600, width = 800)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/Admitted_heat.png', height = 600, width = 800)
 ggplot(map.df, aes(x=long, y=lat, group=group))+
-  ggtitle('Number of Children in Foster Care \n in New York State Counties in 2017')+
+  ggtitle('Number of Children Admitted to Foster Care \n in New York State Counties in 2017')+theme_classic()+
   xlab("Longitude") +
   ylab('Latitude')+
   geom_polygon(aes(fill=Count))+
@@ -121,8 +130,8 @@ counties <- c('NEW YORK CITY', 'SUFFOLK', 'ERIE', 'NASSAU', 'MONROE')
 ds <- subset(df, County %in% counties)
 ds$Count <- ds$Indicated.CPS.Reports
 
-png(file='/Users/janestout/Dropbox/nys-children-in-foster-care-annually/images/top_five_CPS.png', height = 600, width = 800)
-ggplot(ds, aes(x=Year, y=Count, fill=County))+
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/top_five_CPS.png', height = 600, width = 800)
+ggplot(ds, aes(x=Year, y=Count, fill=County))+theme_classic()+
   geom_area()+
   ggtitle('Count of CPS Reports in Top Five \n New York State Counties Over Time')+
   theme(
@@ -137,12 +146,12 @@ ggplot(ds, aes(x=Year, y=Count, fill=County))+
   scale_x_continuous(breaks=Year)
 dev.off()  
 
-ds$Count <- ds$Number.of.Children.Served
+ds$Count <- ds$Admissions
 
-png(file='/Users/janestout/Dropbox/nys-children-in-foster-care-annually/images/top_five_served.png', height = 600, width = 800)
-ggplot(ds, aes(x=Year, y=Count, fill=County))+
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/top_five_served.png', height = 600, width = 800)
+ggplot(ds, aes(x=Year, y=Count, fill=County))+theme_classic()+
   geom_area()+
-  ggtitle('Number of Children Served in Top Five \n New York State Counties Over Time')+
+  ggtitle('Number of Children Admitted to Foster Care in \n Top Five New York State Counties Over Time')+
   theme(
     plot.title = element_text(size=24, face='bold', hjust=.5),
     axis.title = element_text(size=20, face='bold'),
@@ -187,9 +196,9 @@ sums <- aggregate(x = df_2017[c("Adoptive.Home",
                                 "Institution",                  
                                 "Other",                        
                                 "Supervised.Independent.Living")],
-                       by = df_2017[c("Year")],
-                       FUN = sum
-                       )
+                  by = df_2017[c("Year")],
+                  FUN = sum
+)
 
 houses <- data.frame(Housing = c("Adoptive Home", 
                                  "Agency Operated Boarding Home",
@@ -215,8 +224,8 @@ house_counts$Housing <- factor(house_counts$Housing, levels=house_counts$Housing
 #set it to a higher number.
 options(scipen=2)
 
-png(file='/Users/janestout/Dropbox/nys-children-in-foster-care-annually/images/housing.png', height = 600, width = 800)
-ggplot(house_counts, aes(x=house_counts$Housing, y=house_counts$counts))+
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/housing.png', height = 600, width = 800)
+ggplot(house_counts, aes(x=house_counts$Housing, y=house_counts$counts))+theme_classic()+
   geom_point(size=5, color='#FF6347')+
   geom_segment( aes(x=house_counts$Housing, xend=house_counts$Housing, y=0, yend=house_counts$counts))+
   coord_flip()+
