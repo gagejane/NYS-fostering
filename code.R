@@ -1,14 +1,19 @@
+
+### ----------------Required packages------------------------------------------- ###
+
+r_packages <- '/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/r_packages'
+.libPaths(r_packages)
+
+install.packages(c('ggplot2', 'maps', 'mapproj','car','rlang', 'scales', 'colorspace'))
+require(ggplot2, quietly = TRUE, warn.conflicts = FALSE)
+require(maps, quietly = TRUE, warn.conflicts = FALSE)
+require(mapproj, quietly = TRUE, warn.conflicts = FALSE)
+require(car, quietly = TRUE, warn.conflicts = FALSE)
+
 #info for parents about CPS: https://www.preventchildabuseny.org/resour/parents/guide-child-protective-services
 file <- '/Users/janestout/Dropbox/Projects/NYS-foster/children-in-foster-care-annually-beginning-1994.csv'
 df <-read.csv(file)
-
-#Getting to know the data
-head(df)
-str(df)
 attach(df)
-levels(County)
-
-library(ggplot2)
 
 #Create dataframes, aggregating across Year
 df_CPS <- aggregate(Indicated.CPS.Reports ~ Year, df, sum)
@@ -36,15 +41,17 @@ combined_2017 <-combined[which(Year==2017),]
 
 attach(combined)
 #Multiline plot of Admissions, Discharges, and CPS Reports across time
+#change order of legend items: https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/
 png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/NYS_mulitline.png', height = 600, width=800)
 ggplot(combined, aes(Year, Count, colour=Activity)) + theme_classic() +
-  geom_line() + geom_point() + ggtitle('Number of Children in Foster Care and \n CPS Reports in the State of New York Over Time')+
+  geom_line() + geom_point() + ggtitle('Number of Children Admitted into Care and \n CPS Reports in the State of New York Over Time')+
   theme(plot.title = element_text(size=24, face='bold', hjust=.5),
         axis.title = element_text(size=20, face='bold'),
         axis.text = element_text(size=16),
         legend.title = element_text(size=20, face='bold'),
         legend.text = element_text(size=16),
         axis.text.x = element_text(angle=70, hjust=1))+
+  guides(color = guide_legend(reverse = TRUE))+
   scale_x_continuous(breaks=Year) 
 dev.off()
 
@@ -54,34 +61,153 @@ df_2017 <- subset(df, Year == 2017)
 #SOURCES
 #CREATE COUNTY MAP: https://stackoverflow.com/questions/34843932/how-to-create-a-county-map-with-select-counties-highlighted
 #HEATMAP: https://stackoverflow.com/questions/24441775/how-do-you-create-a-us-states-heatmap-based-on-some-values
-
-install.packages('maps')
-library(maps)
-install.packages('mapproj')
-library(mapproj)
-
-
 county_df <- map_data('county')  # mappings of counties by state
 countyMap <- subset(county_df, region=="new york")   # subset just for NYS
 countyMap$county <- countyMap$subregion
 
-#CPS
-df_county_CPS <- aggregate(Indicated.CPS.Reports ~ County, df, sum)
-df_county_CPS$subregion <- tolower(df_county_CPS$County)
-df_county_CPS$Count <- df_county_CPS$Indicated.CPS.Reports
+#make sure county names are consistent across the map package the data source from NY State
+county <- unique(countyMap$subregion)
+analysis <- unique(tolower(df_2017$County))
 
-map.df <- merge(countyMap, df_county_CPS, by='subregion', all.x=T)
+xtab_set <- function(analysis,county){
+  both <- union(analysis,county)
+  in_analysis <- both %in% analysis
+  in_county <- both %in% county
+  return(table(in_analysis,in_county))
+}
+
+xtab_set(analysis,county)
+setdiff(county, analysis)
+setdiff(analysis,county)
+
+#st. lawrence has a period in the CPS data but not in the map package
+countyMap$subregion <- gsub('st ', 'st. ', countyMap$subregion)
+
+#CPS data aggregates data across all boroughs of NYcity; map package make them distinct
+#recode each borough in the map package so that they are each called 'new york city', 
+#all give boroughs will show the same number of CPS reports and Admissions
+countyMap$subregion <- gsub('bronx', 'new york city', countyMap$subregion)
+countyMap$subregion <- gsub('kings', 'new york city', countyMap$subregion)
+countyMap$subregion <- gsub('new york', 'new york city', countyMap$subregion)
+countyMap$subregion <- gsub('queens', 'new york city', countyMap$subregion)
+countyMap$subregion <- gsub('richmond', 'new york city', countyMap$subregion)
+countyMap$subregion <- gsub('new york city city', 'new york city', countyMap$subregion)
+
+#import table of county populations and make sure counties are spelled the same as CPS counties
+file <- '/Users/janestout/Dropbox/Projects/NYS-foster/counties.csv'
+df_pop <-read.csv(file, stringsAsFactors = FALSE)
+df_pop$Population <- as.numeric(gsub(',', '', df_pop$Population))
+
+pop <- tolower(df_pop$County)
+pop <- gsub(' county', '', pop)
+pop
+
+xtab_set <- function(analysis,pop){
+  both <- union(analysis,pop)
+  in_analysis <- both %in% analysis
+  in_pop <- both %in% pop
+  return(table(in_analysis,in_pop))
+}
+
+xtab_set(analysis,pop)
+setdiff(pop, analysis)
+setdiff(analysis,pop)
+
+my_vars <- c('County','Population')
+df_pop_cleaned <-df_pop[my_vars]
+kings <- as.numeric(df_pop_cleaned[1,'Population'])
+queens <- as.numeric(df_pop_cleaned[2,'Population'])
+ny <- as.numeric(df_pop_cleaned[3,'Population'])
+bronx <- as.numeric(df_pop_cleaned[5,'Population'])
+richmond <- as.numeric(df_pop_cleaned[10,'Population'])
+nyc <- kings+queens+ny+bronx+richmond
+df_pop_cleaned <- df_pop_cleaned[-c(1,2,3,5,10),]
+df_pop_cleaned[nrow(df_pop_cleaned)+1,] <- list('new york city',nyc)
+df_pop_cleaned$County <- gsub(' County', '', df_pop_cleaned$County)
+df_pop_cleaned$County <- toupper(df_pop_cleaned$County)
+df_pop_cleaned
+
+#CPS
+df_county_CPS_2017 <- aggregate(Indicated.CPS.Reports ~ County, df_2017, sum)
+df_county_CPS_2017$subregion <- tolower(df_county_CPS_2017$County)
+df_county_CPS_2017$Count_CPS <- df_county_CPS_2017$Indicated.CPS.Reports
+df_county_CPS_2017 <- merge(df_county_CPS_2017, df_pop_cleaned, by='County')
+# df_county_CPS_2017$prop <- df_county_CPS_2017$Count/df_county_CPS_2017$Population
+
+# map.df <- merge(countyMap, df_county_CPS_2017, by='subregion', all.x=T)
+# map.df <- map.df[order(map.df$order),]
+# #breaks <- quantile(df_county_CPS_2017$Count, probs = seq(0, 1, length.out = n))
+# #breaks <- seq(min(df_county_CPS_2017$Count), max(df_county_CPS_2017$Count), length=10)
+# #limits <- c(min(df_county_CPS_2017$Count), max(df_county_CPS_2017$Count))
+# #scale_fill_gradientn(colours=rev(heat.colors(200)),na.value='grey90', breaks = seq(min(df_county_CPS_2017$Count), max(df_county_CPS_2017$Count), length=200))+
+#   
+# 
+# png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/CPS_heat1.png', height = 600, width=800)
+# ggplot(map.df, aes(x=long, y=lat, group=group))+
+#   ggtitle('Number of CPS Reports in \n New York State Counties in 2017')+theme_classic()+
+#   xlab("Longitude") +
+#   ylab('Latitude')+
+#   geom_polygon(aes(fill=Count_CPS))+
+#   geom_path()+
+#   theme(plot.title = element_text(size=14, face='bold', hjust=.5))+
+#   scale_fill_gradientn(colours=rev(heat.colors(200)),na.value='grey90')+
+#   coord_map()+
+#   theme(
+#     plot.title = element_text(size=24, face='bold', hjust=.5),
+#     axis.title = element_text(size=20, face='bold'),
+#     axis.text = element_text(size=16),
+#     legend.title = element_text(size=20, face='bold'),
+#     legend.text = element_text(size=16),
+#     panel.border = element_blank()
+#   )
+# dev.off()
+
+#Number Admitted
+df_county_admit_2017 <- aggregate(Admissions ~ County, df_2017, sum)
+df_county_admit_2017$subregion <- tolower(df_county_admit_2017$County)
+df_county_admit_2017$Count_Admit <- df_county_admit_2017$Admissions
+
+# map.df <- merge(countyMap, df_county_admit_2017, by='subregion', all.x=T)
+# map.df <- map.df[order(map.df$order),]
+# 
+# png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/Admitted_heat.png', height = 600, width = 800)
+# ggplot(map.df, aes(x=long, y=lat, group=group))+
+#   ggtitle('Number of Children Admitted to Foster Care \n in New York State Counties in 2017')+theme_classic()+
+#   xlab("Longitude") +
+#   ylab('Latitude')+
+#   geom_polygon(aes(fill=Count_Admit))+
+#   geom_path()+
+#   theme(plot.title = element_text(size=14, face='bold', hjust=.5))+
+#   scale_fill_gradientn(colours=rev(heat.colors(200)),na.value='grey90')+
+#   coord_map()+
+#   theme(
+#     plot.title = element_text(size=24, face='bold', hjust=.5),
+#     axis.title = element_text(size=20, face='bold'),
+#     axis.text = element_text(size=16),
+#     legend.title = element_text(size=20, face='bold'),
+#     legend.text = element_text(size=16),
+#     panel.border = element_blank()
+#   )
+# dev.off()
+
+
+#Proportion CPS/admitted
+df_county_merged_2017 <- merge(df_county_CPS_2017, df_county_admit_2017, by='subregion')
+df_county_merged_2017$Proportion <- df_county_merged_2017$Count_Admit/df_county_merged_2017$Count_CPS
+df_county_merged_2017 <- df_county_merged_2017[order(-df_county_merged_2017$Proportion),]
+
+map.df <- merge(countyMap, df_county_merged_2017, by='subregion', all.x=T)
 map.df <- map.df[order(map.df$order),]
 
-png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/CPS_heat1.png', height = 600, width=800)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/prop_heat.png', height = 600, width = 800)
 ggplot(map.df, aes(x=long, y=lat, group=group))+
-  ggtitle('Number of CPS Reports in \n New York State Counties in 2017')+theme_classic()+
+  ggtitle('Proportion of Children Admitted to Foster Care Given the \nNumber of CPS Reports, by County, in 2017')+theme_classic()+
   xlab("Longitude") +
   ylab('Latitude')+
-  geom_polygon(aes(fill=Count))+
+  geom_polygon(aes(fill=Proportion))+
   geom_path()+
   theme(plot.title = element_text(size=14, face='bold', hjust=.5))+
-  scale_fill_gradientn(colours=rev(heat.colors(10)),na.value='grey90')+
+  scale_fill_gradientn(colours=rev(heat.colors(20)),na.value='grey90')+
   coord_map()+
   theme(
     plot.title = element_text(size=24, face='bold', hjust=.5),
@@ -93,24 +219,21 @@ ggplot(map.df, aes(x=long, y=lat, group=group))+
   )
 dev.off()
 
-#Number Served
-df_county_admit <- aggregate(Admissions ~ County, df, sum)
-df_county_admit$subregion <- tolower(df_county_admit$County)
-df_county_admit$Count <- df_county_admit$Admissions
-
-map.df <- merge(countyMap, df_county_admit, by='subregion', all.x=T)
-map.df <- map.df[order(map.df$order),]
-
-png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/Admitted_heat.png', height = 600, width = 800)
-ggplot(map.df, aes(x=long, y=lat, group=group))+
-  ggtitle('Number of Children Admitted to Foster Care \n in New York State Counties in 2017')+theme_classic()+
-  xlab("Longitude") +
-  ylab('Latitude')+
-  geom_polygon(aes(fill=Count))+
-  geom_path()+
-  theme(plot.title = element_text(size=14, face='bold', hjust=.5))+
-  scale_fill_gradientn(colours=rev(heat.colors(10)),na.value='grey90')+
-  coord_map()+
+#plotting source https://www.r-graph-gallery.com/275-add-text-labels-with-ggplot2/
+options(scipen=2)
+png(file='/Users/janestout/Dropbox/Projects/NYS-foster/nys-children-in-foster-care-annually/images/prop_pop.png', height = 600, width = 1200)
+ggplot(df_county_merged_2017, aes(x=Proportion, y=Population)) +
+  ggtitle('Proportion of Children Admitted to Foster Care \nGiven the Number of CPS Reports by County and Population in 2017')+theme_classic()+
+  xlab("Proportion Admitted/CPS Reports") +
+  ylab('County Population')+
+  geom_point(
+    color="red",
+    fill="blue",
+    shape=1,
+    alpha=0.5,
+    size=2,
+    stroke = 2
+  )+
   theme(
     plot.title = element_text(size=24, face='bold', hjust=.5),
     axis.title = element_text(size=20, face='bold'),
@@ -118,12 +241,15 @@ ggplot(map.df, aes(x=long, y=lat, group=group))+
     legend.title = element_text(size=20, face='bold'),
     legend.text = element_text(size=16),
     panel.border = element_blank()
-  )
+  ) +  geom_label(label = df_county_merged_2017$County.x, colour = "darkviolet", fontface = "bold", size=4)
 dev.off()
 
 
 #DISPLAY TOP FIVE COUNTIES OVER TIME
-
+#CPS
+df_county_CPS <- aggregate(Indicated.CPS.Reports ~ County, df, sum)
+df_county_CPS$subregion <- tolower(df_county_CPS$County)
+df_county_CPS$Count <- df_county_CPS$Indicated.CPS.Reports
 data <- df_county_CPS[order(-df_county_CPS$Count),]
 
 counties <- c('NEW YORK CITY', 'SUFFOLK', 'ERIE', 'NASSAU', 'MONROE')

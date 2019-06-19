@@ -1,0 +1,20 @@
+Package: gclus
+Version: 1.3.2
+Author: Catherine Hurley
+Date: 2019-01-07
+Maintainer: Catherine Hurley <catherine.hurley@mu.ie>
+Title: Clustering Graphics
+Description: Orders panels in scatterplot matrices and parallel coordinate
+ displays by some merit index. Package contains various indices of merit,
+ ordering functions, and enhanced versions of pairs and parcoord which
+ color panels according to their merit level.
+Depends: R (>= 2.10), cluster
+License: GPL (>= 2)
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.1.0
+NeedsCompilation: no
+Packaged: 2019-01-07 17:20:54 UTC; catherine
+Repository: CRAN
+Date/Publication: 2019-01-07 20:00:09 UTC
+Built: R 3.4.4; ; 2019-01-22 15:52:49 UTC; unix

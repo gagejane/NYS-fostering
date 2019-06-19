@@ -1,0 +1,74 @@
+Engel95                 1995 British Family Expenditure Survey
+Italy                   Italian GDP Panel
+b.star                  Compute Optimal Block Length for Stationary and
+                        Circular Bootstrap
+cps71                   Canadian High School Graduate Earnings
+gradients               Extract Gradients
+np                      Nonparametric Kernel Smoothing Methods for
+                        Mixed Data Types
+npcdens                 Kernel Conditional Density Estimation with
+                        Mixed Data Types
+npcdensbw               Kernel Conditional Density Bandwidth Selection
+                        with Mixed Data Types
+npcdist                 Kernel Conditional Distribution Estimation with
+                        Mixed Data Types
+npcdistbw               Kernel Conditional Distribution Bandwidth
+                        Selection with Mixed Data Types
+npcmstest               Kernel Consistent Model Specification Test with
+                        Mixed Data Types
+npconmode               Kernel Modal Regression with Mixed Data Types
+npcopula                Kernel Copula Estimation with Mixed Data Types
+npdeneqtest             Kernel Consistent Density Equality Test with
+                        Mixed Data Types
+npdeptest               Kernel Consistent Pairwise Nonlinear Dependence
+                        Test for Univariate Processes
+npindex                 Semiparametric Single Index Model
+npindexbw               Semiparametric Single Index Model Parameter and
+                        Bandwidth Selection
+npksum                  Kernel Sums with Mixed Data Types
+npplot                  General Purpose Plotting of Nonparametric
+                        Objects
+npplreg                 Partially Linear Kernel Regression with Mixed
+                        Data Types
+npplregbw               Partially Linear Kernel Regression Bandwidth
+                        Selection with Mixed Data Types
+npqcmstest              Kernel Consistent Quantile Regression Model
+                        Specification Test with Mixed Data Types
+npqreg                  Kernel Quantile Regression with Mixed Data
+                        Types
+npquantile              Kernel Univariate Quantile Estimation
+npreg                   Kernel Regression with Mixed Data Types
+npregbw                 Kernel Regression Bandwidth Selection with
+                        Mixed Data Types
+npregiv                 Nonparametric Instrumental Regression
+npregivderiv            Nonparametric Instrumental Derivatives
+npscoef                 Smooth Coefficient Kernel Regression
+npscoefbw               Smooth Coefficient Kernel Regression Bandwidth
+                        Selection
+npsdeptest              Kernel Consistent Serial Dependence Test for
+                        Univariate Nonlinear Processes
+npseed                  Set Random Seed
+npsigtest               Kernel Regression Significance Test with Mixed
+                        Data Types
+npsymtest               Kernel Consistent Density Asymmetry Test with
+                        Mixed Data Types
+nptgauss                Truncated Second-order Gaussian Kernels
+npudens                 Kernel Density Estimation with Mixed Data Types
+npudensbw               Kernel Density Bandwidth Selection with Mixed
+                        Data Types
+npudist                 Kernel Distribution Estimation with Mixed Data
+                        Types
+npudistbw               Kernel Distribution Bandwidth Selection with
+                        Mixed Data Types
+npuniden.boundary       Kernel Bounded Univariate Density Estimation
+                        Via Boundary Kernel Functions
+npuniden.reflect        Kernel Bounded Univariate Density Estimation
+                        Via Data-Reflection
+npuniden.sc             Kernel Shape Constrained Bounded Univariate
+                        Density Estimation
+npunitest               Kernel Consistent Univariate Density Equality
+                        Test with Mixed Data Types
+oecdpanel               Cross Country Growth Panel
+se                      Extract Standard Errors
+uocquantile             Compute Quantiles
+wage1                   Cross-Sectional Data on Wages

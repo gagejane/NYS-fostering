@@ -1,0 +1,21 @@
+Package: CARS
+Title: Covariate Assisted Ranking and Screening for Large-Scale
+        Two-Sample Inference
+Version: 0.2.2
+Authors@R: person("Weinan", "Wang", email="weinanw@usc.edu", role=c("cre","aut"))
+Description: It implements the CARS procedure, which is a two-sample multiple testing procedure that utilizes an additional auxiliary variable to capture the sparsity information, hence improving power. The CARS procedure is shown to be asymptotically valid and optimal for FDR control. For more information, please see the website <http://www-bcf.usc.edu/~wenguans/Papers/CARS.html> and the accompanying paper.
+Depends: R (>= 3.2.2)
+Imports: np, stats
+Encoding: UTF-8
+LazyData: true
+License: MIT + file LICENSE
+RoxygenNote: 6.1.0
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2019-01-19 23:36:06 UTC; weinanwang
+Author: Weinan Wang [cre, aut]
+Maintainer: Weinan Wang <weinanw@usc.edu>
+Repository: CRAN
+Date/Publication: 2019-01-20 00:20:03 UTC
+Built: R 3.4.4; ; 2019-01-22 20:26:53 UTC; unix
